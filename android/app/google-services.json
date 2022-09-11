@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "279291700585",
+    "project_id": "dts-final-project-d650a",
+    "storage_bucket": "dts-final-project-d650a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279291700585:android:f9746e0b71e90cfd01c9f8",
+        "android_client_info": {
+          "package_name": "com.projectpertama"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "279291700585-kmmbbciv8ijiu90gvk624k3589aiievf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.projectpertama",
+            "certificate_hash": "2eee4dbf137839b883cb4ffe41f262283f46564d"
+          }
+        },
+        {
+          "client_id": "279291700585-du458cqc3lcqmbovq44u4c8cs0b7a12k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfNwSuprh_vTzHuz8RWDH1BMu-gr6SKb0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "279291700585-du458cqc3lcqmbovq44u4c8cs0b7a12k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
