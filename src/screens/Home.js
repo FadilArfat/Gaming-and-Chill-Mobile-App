@@ -55,7 +55,7 @@ function Home() {
     {name: 'fighting', filter: `&genres=6`},
   ];
 
-  const api_key = '247f561e517b4dde96fe9ed3496c64ff';
+  const api_key = ''; //ADD YOUR OWN RAWG API
 
   const Loading = () => (
     <View

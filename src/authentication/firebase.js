@@ -13,14 +13,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyBcmpdAtxzYXke9Xmteb1lKAMAWQs3Uz4g',
-  authDomain: 'dts-final-project-d650a.firebaseapp.com',
-  projectId: 'dts-final-project-d650a',
-  storageBucket: 'dts-final-project-d650a.appspot.com',
-  messagingSenderId: '279291700585',
-  appId: '1:279291700585:web:300d40c741eff8e701c9f8',
-};
+const firebaseConfig = {}; //ADD YOUR OWN FIREBASE CONFIG
 
 // Initialize Firebase
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
