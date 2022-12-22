@@ -20,23 +20,27 @@ import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Banner from './component/Banner';
 import {useDispatch, useSelector} from 'react-redux';
-import {addUserData, getAllData} from '../context/SliceUser';
+import {
+  addApiData,
+  addUserData,
+  getAllData,
+  getApi,
+} from '../context/SliceUser';
 import firestore from '@react-native-firebase/firestore';
 import {auth} from '../authentication/firebase';
 import HomeSkeleton from './skeleton/HomeSkeleton';
 import {newGames} from '../api/defaultVal';
-import Banner1 from '../images/Banner.png';
-import Banner2 from '../images/Banner1.png';
-import Banner3 from '../images/Banner2.png';
 
 function Home() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const list = useSelector(getAllData);
+  const key_rawg = useSelector(state => state.list.api);
   const [games, setGames] = useState([]);
   const [genres, setGenres] = useState([]);
   const [didFinishInitialAnimation, setdidFinishInitialAnimation] =
     useState(false);
+
+  console.log(key_rawg);
 
   const genre = [
     {name: 'action', filter: `&genres=4`},
@@ -55,7 +59,7 @@ function Home() {
     {name: 'fighting', filter: `&genres=6`},
   ];
 
-  const api_key = ''; //ADD YOUR OWN RAWG API
+  const api_key = key_rawg; //ADD YOUR OWN RAWG API
 
   const Loading = () => (
     <View
@@ -71,12 +75,20 @@ function Home() {
 
   const getData = async () => {
     try {
-      const users = await firestore()
+      firestore()
         .collection('favorites')
         .doc(auth.currentUser.uid)
-        .get();
-      const pas = users.data();
-      dispatch(addUserData(pas));
+        .onSnapshot(snapshoot => dispatch(addUserData(snapshoot.data())));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getApiData = async () => {
+    try {
+      const kunci = await firestore().collection('api').doc('env').get();
+      const ki = kunci.data().rawg_key;
+      dispatch(addApiData(ki));
     } catch (error) {
       console.log(error);
     }
@@ -116,9 +128,10 @@ function Home() {
           source={{uri: item.background_image}}
           style={{
             position: 'absolute',
-            width: 165,
-            height: 200,
+           height: 200,
+           width: '100%',
             borderRadius: 10,
+            aspectRatio: 1
           }}
         />
         <LinearGradient
@@ -147,7 +160,7 @@ function Home() {
     const fetchGames = async () => {
       try {
         const responseDariRAWG = await axios.get(
-          `https://api.rawg.io/api/games?key=${api_key}${newGames}${genres}`,
+          `https://api.rawg.io/api/games?key=${key_rawg}${newGames}${genres}`,
           {
             params: {
               _limit: 20,
@@ -157,24 +170,24 @@ function Home() {
         const gameArray = responseDariRAWG.data.results;
         setGames(gameArray);
       } catch (error) {
-        alert('Network Error');
         console.log(error);
       }
     };
 
-    if (games.length === 0 || genre.length > 0) {
-      fetchGames();
-      componentDidMount();
-    }
-
     auth.onAuthStateChanged(user => {
       if (user) {
+        getApiData();
         getData();
       } else {
         navigation.navigate('Login');
       }
     });
-  }, [genres, list]); //list
+
+    if (games.length === 0 || genre.length > 0) {
+      fetchGames();
+      componentDidMount();
+    }
+  }, [genres, key_rawg]); //list
 
   if (games.length === 0) {
     return <Loading />;
@@ -246,7 +259,7 @@ function Home() {
                   style={{
                     borderRadius: 12,
                     padding: 10,
-                    backgroundColor: '#0B1320',
+                    backgroundColor: '#21385f',
                   }}>
                   <Text
                     style={{

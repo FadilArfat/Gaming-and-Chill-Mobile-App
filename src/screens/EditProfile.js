@@ -1,19 +1,15 @@
-import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Block, Text} from 'galio-framework';
-import {keluarDariAplikasi} from '../authentication/firebase';
 import {
-  Image,
-  ScrollView,
   TextInput,
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
   View,
-  Button,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
-import ProfilePic from '../images/user.png';
+
 import {useSelector} from 'react-redux';
 import BannerProfile from '../images/banner_profile.jpg';
 import {getAllData} from '../context/SliceUser';
@@ -22,11 +18,13 @@ import storage from '@react-native-firebase/storage';
 import {auth} from '../authentication/firebase';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {launchImageLibrary} from 'react-native-image-picker';
+import {useEffect} from 'react';
 const EditProfile = () => {
   const list = useSelector(getAllData);
   const [username, setUsername] = useState('');
-  const [downloadURL, setDownloadURL] = useState();
-  console.log(downloadURL);
+  const [downloadURL, setDownloadURL] = useState('');
+  const [spin, setSpin] = useState(false);
+  console.log(spin);
 
   const onSelectImagePress = async () => {
     try {
@@ -38,26 +36,27 @@ const EditProfile = () => {
   const onMediaSelect = async media => {
     try {
       if (!media.didCancel) {
+        setSpin(true);
         const reference = storage().ref(media.fileName);
         const task = reference.putFile(media.uri);
         task.then(async () => {
           const downloadURL = await reference.getDownloadURL();
           setDownloadURL(downloadURL);
         });
+        setSpin(false);
       }
     } catch (error) {
+      setSpin(false);
       console.log(error);
     }
   };
 
+  const handleUsernamChange = text => {
+    setUsername(text);
+  };
+
   const handleUpdate = async () => {
     try {
-      if (downloadURL === null && list.images) {
-        setDownloadURL(list.images);
-      }
-      if (username == null && list.username) {
-        setUsername(list.username);
-      }
       await firestore()
         .collection('favorites')
         .doc(auth.currentUser.uid)
@@ -74,6 +73,13 @@ const EditProfile = () => {
     }
   };
 
+  useEffect(() => {
+    if (list.images && list.username) {
+      setDownloadURL(list.images);
+      setUsername(list.username);
+    }
+  }, []);
+
   return (
     <Block style={{flex: 1, backgroundColor: '#1C3F60'}}>
       <Block
@@ -85,7 +91,7 @@ const EditProfile = () => {
         <ImageBackground
           source={{
             uri: list.images
-              ? list.images
+              ? downloadURL
               : 'https://cdn.dribbble.com/users/6142/screenshots/5679189/media/1b96ad1f07feee81fa83c877a1e350ce.png?compress=1&resize=400x300&vertical=top',
           }}
           style={{width: 100, height: 100}}
@@ -97,23 +103,44 @@ const EditProfile = () => {
               alignItems: 'center',
             }}>
             <TouchableOpacity onPress={onSelectImagePress}>
-              <MaterialCommunityIcons
-                name="camera"
-                size={35}
-                color="#fff"
-                style={{
-                  opacity: 0.7,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: '#fff',
-                  borderRadius: 10,
-                }}
-              />
+              {!spin ? (
+                <MaterialCommunityIcons
+                  name="camera"
+                  size={35}
+                  color="#fff"
+                  style={{
+                    opacity: 0.7,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: '#fff',
+                    borderRadius: 10,
+                  }}
+                />
+              ) : (
+                <MaterialCommunityIcons
+                  name="loading"
+                  size={35}
+                  color="#fff"
+                  style={{
+                    opacity: 0.7,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderWidth: 1,
+                    borderColor: '#fff',
+                    borderRadius: 10,
+                  }}
+                />
+              )}
             </TouchableOpacity>
           </View>
         </ImageBackground>
       </Block>
+      {spin ? (
+        <Text style={{marginHorizontal: 15, color: 'white', marginTop: 15}}>
+          Loading
+        </Text>
+      ) : null}
       <Block style={{flex: 0.8}}>
         <Text
           style={{
@@ -129,10 +156,11 @@ const EditProfile = () => {
           Username
         </Text>
         <TextInput
-          placeholder={list.username}
+          placeholder="Username"
           autoCorrect={false}
-          onChangeText={text => setUsername(text)}
+          onChangeText={handleUsernamChange}
           style={styles.input}
+          value={username}
         />
         <View
           style={{
@@ -174,6 +202,7 @@ var styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 5,
     marginHorizontal: 10,
+    color: 'black',
   },
 });
 

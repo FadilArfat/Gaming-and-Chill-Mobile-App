@@ -4,8 +4,6 @@ import {
   Image,
   TouchableOpacity,
   StatusBar,
-  ScrollView,
-  FlatList,
   StyleSheet,
   TextInput,
   ActivityIndicator,
@@ -15,21 +13,22 @@ import axios from 'axios';
 import {FlatGrid} from 'react-native-super-grid';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import {useSelector} from 'react-redux';
+import {getApi} from '../context/SliceUser';
 
 function Search() {
   const navigation = useNavigation();
   const [games, setGames] = useState([]);
   const [search, setSearch] = useState([]);
   const [loading, isLoading] = useState(false);
-
-  const api_key = '247f561e517b4dde96fe9ed3496c64ff';
+  const key = useSelector(getApi);
 
   useEffect(() => {
     const fetchGames = async () => {
       try {
         isLoading(true);
         const responseDariRAWG = await axios.get(
-          `https://api.rawg.io/api/games?key=${api_key}${search}`,
+          `https://api.rawg.io/api/games?key=${key}${search}`,
         );
         const gameArray = await Promise.all(responseDariRAWG.data.results);
         setGames(gameArray);

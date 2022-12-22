@@ -6,9 +6,6 @@ import {
   ScrollView,
   Text,
   View,
-  Dimensions,
-  Modal,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import rawg from '../api/rawg';
@@ -19,8 +16,9 @@ import firebase from '@react-native-firebase/app';
 import firestore from '@react-native-firebase/firestore';
 import {auth} from '../authentication/firebase';
 import {Button} from 'galio-framework';
-import {useDispatch, useSelector} from 'react-redux';
-import {addUserData, getAllData} from '../context/SliceUser';
+import {useSelector} from 'react-redux';
+import {getAllData, getApi} from '../context/SliceUser';
+import axios from 'axios';
 
 const Detail = ({route}) => {
   const [gamedetail, setGameDetail] = useState([]);
@@ -30,7 +28,8 @@ const Detail = ({route}) => {
   const [isExist, setIsExist] = useState(false);
   const [savingSpinner, setSavingSpinner] = useState(false);
   const list = useSelector(getAllData);
-  console.log(isExist);
+  const key = useSelector(getApi);
+  console.log(key);
 
   const Loading = () => (
     <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
@@ -89,8 +88,8 @@ const Detail = ({route}) => {
   const gameScreenshoot = async () => {
     try {
       setLoadingSS(true);
-      const resScreenshoot = await rawg.get(
-        `/games/${route.params.paramKey}/screenshots`,
+      const resScreenshoot = await axios.get(
+        `https://api.rawg.io/api/games/${route.params.paramKey}/screenshots?key=${key}`,
       );
       const newArr = await Promise.all(resScreenshoot.data.results);
       setScreenShoot(newArr);
@@ -114,8 +113,8 @@ const Detail = ({route}) => {
     const fetchDataGamesDetail = async () => {
       try {
         setLoading(true);
-        const responseDariRAWG = await rawg.get(
-          `/games/${route.params.paramKey}`,
+        const responseDariRAWG = await axios.get(
+          `https://api.rawg.io/api/games/${route.params.paramKey}?key=${key}`,
         );
         setGameDetail(responseDariRAWG.data);
         setLoading(false);
@@ -126,7 +125,7 @@ const Detail = ({route}) => {
     fetchDataGamesDetail();
     gameScreenshoot();
     handleExist();
-  }, []);
+  }, [isExist]);
 
   if (loading === true) {
     return <Loading />;

@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  BackHandler,
 } from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
@@ -79,9 +80,27 @@ const LoginOrRegisterForm = ({loginOrRegister}) => {
   };
 
   useEffect(() => {
+    const backAction = () => {
+      Alert.alert('Hold on!', 'Are you sure you want to quit?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {text: 'YES', onPress: () => BackHandler.exitApp()},
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
     if (user) {
       navigation.navigate('Home');
     }
+    return () => backHandler.remove();
   }, [user]);
 
   return (
@@ -187,6 +206,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     marginTop: 5,
+    color: 'black',
   },
   buttonContainer: {
     width: '60%',
@@ -212,8 +232,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
-  buttonOutlineText: {
-    color: '#0782f9',
+  OutlineText: {
+    color: 'black',
     fontWeight: '700',
     fontSize: 16,
   },

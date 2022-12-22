@@ -16,12 +16,30 @@ import {Provider} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SplashScreen from 'react-native-splash-screen';
 import {Button, TouchableOpacity} from 'react-native';
+import messaging from '@react-native-firebase/messaging';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function App() {
+  const requestUserPermission = async () => {
+    const authStatus = await messaging().requestPermission();
+    console.log('Authorization status(authState):', authStatus);
+    return (
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL
+    );
+  };
+
   useEffect(() => {
+    if (requestUserPermission()) {
+      messaging()
+        .getToken()
+        .then(token => {
+          return console.log(token);
+        });
+    } else console.log('Not Authorization status:', authStatus);
+
     SplashScreen.hide();
   }, []);
   return (
@@ -149,7 +167,7 @@ function Tab1() {
             <Icon name={'home'} color={color} size={size} />
           ),
         }}
-        name="Home Navigator"
+        name="Home "
         component={Home}
       />
       <Tab.Screen
